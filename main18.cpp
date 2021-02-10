@@ -36,19 +36,19 @@ int main()
     //imshow("ygrad",ygrad);
 
     Mat xygrad = Mat(xgrad.size(),xgrad.type());
-//    int width = xgrad.cols;
-//    int height = ygrad.rows;
-//    for(int row = 0;row<height;row++){
-//        for(int col = 0;col<width;col++)
-//        {
-//            int xg = xgrad.at<uchar>(row,col);
-//            int yg = ygrad.at<uchar>(row,col);
-//            int xy = xg +yg;
-//            xygrad.at<uchar>(row,col) = saturate_cast<uchar>(xy);
-//        }
-//    }
-    addWeighted(xgrad,0.5,ygrad,0.5,0,xygrad);
-    //threshold(xygrad,xygrad,0,255,THRESH_OTSU | THRESH_BINARY);
+   int width = xgrad.cols;
+   int height = ygrad.rows;
+   for(int row = 0;row<height;row++){
+       for(int col = 0;col<width;col++)
+       {
+           int xg = xgrad.at<uchar>(row,col);
+           int yg = ygrad.at<uchar>(row,col);
+           int xy = xg +yg;
+           xygrad.at<uchar>(row,col) = saturate_cast<uchar>(xy);
+       }
+   }
+    //addWeighted(xgrad,0.5,ygrad,0.5,0,xygrad);
+    threshold(xygrad,xygrad,0,255,THRESH_OTSU | THRESH_BINARY);
     imshow(OUTPUT_WIN,~xygrad);
     imwrite("1-2.jpg",~xygrad);
 
