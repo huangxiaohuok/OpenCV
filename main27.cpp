@@ -5,6 +5,7 @@ using namespace cv;
 using namespace std;
 
 Mat src,hsv,hue;
+Mat Hue,Sat,Val;
 int bins = 12;
 void Hist_Add_Backprojection(int,void*);
 int main()
@@ -25,6 +26,23 @@ int main()
     hue.create(hsv.size(),hsv.depth());
     int nchannels[] = {0,0};//指定被复制通道与要复制到的位置组成的索引对
     mixChannels(&hsv,1,&hue,1,nchannels,1);//mixChannels函数把hsv中0通道的色相值复制到Hue中的0通道
+    
+    //分离Hue/色相通道
+    int ch[] = {0, 0};
+    Hue.create(hsv.size(),hsv.depth());
+    mixChannels(&hsv, 1, &Hue, 1, ch, 1);
+    imshow("H channel", Hue);
+    //分离Saturation/饱和度通道
+    int ch1[] = {1, 0};
+    Sat.create(hsv.size(),hsv.depth());
+    mixChannels(&hsv, 1, &Sat, 1, ch1, 1);
+    imshow("S channel", Sat);
+    //分离Value/色调通道
+    int ch2[] = {2, 0};
+    Val.create(hsv.size(),hsv.depth());
+    mixChannels(&hsv, 1, &Val, 1, ch2, 1);
+    imshow("V channel", Val);
+    
     createTrackbar("Histogram Bins:",window_image,&bins,180,Hist_Add_Backprojection);
     Hist_Add_Backprojection(0,0);
 
