@@ -11,15 +11,13 @@ int main()
     Mat base,test1,test2;
     Mat hsvbase,hsvtest1,hsvtest2;
     base = imread("F:/Qt/OpenCV/26/OPenCV26/1.jpg");
-    if(base.empty())
+    test1 = imread("F:/Qt/OpenCV/26/OPenCV26/2.jpg");
+    test2 = imread("F:/Qt/OpenCV/26/OPenCV26/3.jpg");
+    if(base.empty() || test1.empty() || test2.empty())
     {
         qDebug()<<"could not load image...\n";
         return -1;
     }
-
-    test1 = imread("F:/Qt/OpenCV/26/OPenCV26/2.jpg");
-    test2 = imread("F:/Qt/OpenCV/26/OPenCV26/3.jpg");
-
     cvtColor(base,hsvbase,CV_BGR2HSV);//HSV：色度、饱和度、亮度
     cvtColor(test1,hsvtest1,CV_BGR2HSV);
     cvtColor(test2,hsvtest2,CV_BGR2HSV);
