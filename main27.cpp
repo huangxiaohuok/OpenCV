@@ -43,6 +43,20 @@ int main()
     mixChannels(&hsv, 1, &Val, 1, ch2, 1);
     imshow("V channel", Val);
     
+   
+//     Mat bgra( 500, 500, CV_8UC4, Scalar(255,255,0,255) );
+//     Mat bgr( bgra.rows, bgra.cols, CV_8UC3 );
+//     Mat alpha( bgra.rows, bgra.cols, CV_8UC1 );
+
+//     Mat out[] = { bgr, alpha };
+
+//     int from_to[] = { 0, 2, 1, 1, 2, 0, 3, 3 };
+//     mixChannels( &bgra, 1, out, 2, from_to, 4 );
+
+//     imshow("bgra", bgra);
+//     imshow("bgr", bgr);
+
+    
     createTrackbar("Histogram Bins:",window_image,&bins,180,Hist_Add_Backprojection);
     Hist_Add_Backprojection(0,0);
 
