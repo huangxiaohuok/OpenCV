@@ -23,8 +23,8 @@ int main()
 
     cvtColor(src,hsv,CV_BGR2HSV);
     hue.create(hsv.size(),hsv.depth());
-    int nchannels[] = {0,0};
-    mixChannels(&hsv,1,&hue,1,nchannels,1);//mixChannels主要就是把输入的矩阵（或矩阵数组）的某些通道拆分复制给对应的输出矩阵（或矩阵数组）的某些通道中，其中的对应关系就由fromTo参数指定.
+    int nchannels[] = {0,0};//指定被复制通道与要复制到的位置组成的索引对
+    mixChannels(&hsv,1,&hue,1,nchannels,1);//mixChannels函数把hsv中0通道的色相值复制到Hue中的0通道
     createTrackbar("Histogram Bins:",window_image,&bins,180,Hist_Add_Backprojection);
     Hist_Add_Backprojection(0,0);
 
@@ -41,6 +41,9 @@ void Hist_Add_Backprojection(int,void*)
     normalize(h_hist,h_hist,0,255,NORM_MINMAX,-1,Mat());
 
     Mat backPrjImage;
+    //反向投影矩阵中某点的值就是它对应的原图像中的点所在区间的灰度直方图值
+    //先求出原图像的直方图，再由直方图得到反向投影矩阵，由直方图到反向投影矩阵实际上就是一个反向的过程，所以叫反向
+    //该bin值代表了（目标区域）上该像素值出现的概率
     calcBackProject(&hue,1,0,h_hist,backPrjImage,&histRanges,1,true);
     imshow("BackProj",backPrjImage);
 
