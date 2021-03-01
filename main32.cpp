@@ -57,6 +57,7 @@ void Demo_Moments(int,void*)
     }
     Mat drawImg;
     src.copyTo(drawImg);
+    //drawImg = Mat::zeros(src.size(),CV_8UC3);
     for (size_t i = 0;i <contours.size();i++)
     {
         if(contours[i].size() < 100)
