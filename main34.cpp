@@ -16,7 +16,7 @@ int main()
     namedWindow(input_win,CV_WINDOW_AUTOSIZE);
     imshow(input_win,src);
 
-    //1.改变背景色为黑色
+    //1.改变背景色为黑色-目的是为后面距离变换做准备
     for (int row = 0;row<src.rows;row++)
     {
         for (int col = 0;col < src.cols;col++)
@@ -35,7 +35,9 @@ int main()
     Mat kernel = (Mat_<float>(3,3)<<1,1,1,1,-8,1,1,1,1);
     Mat imgLaplance;
     Mat sharpenImg = src;
+    //CV_32F是float,像素是在0-1.0之间的任意值，但是它必须通过将每个像素乘以255来转换成8位来保存或显示。
     filter2D(src,imgLaplance,CV_32F,kernel,Point(-1,-1),0,BORDER_DEFAULT);
+    //输出值为sharpenImg
     src.convertTo(sharpenImg,CV_32F);
     Mat resultImg = sharpenImg - imgLaplance;
 
@@ -52,7 +54,11 @@ int main()
 
     //4.距离变换,对距离变换结果进行归一化到[0~1]之间
     Mat distImg;
-    distanceTransform(binaryImg,distImg,DIST_L1,3,5);
+    //distanceTransform方法用于计算图像中每一个非零点距离离自己最近的零点的距离，
+    //distanceTransform的第一个参数为输入的图像，一般为二值图像，第二个Mat矩阵参数dst保存了每一个点与最近的零点的距离信息，
+    //图像上越亮的点，代表了离零点的距离越远。
+    distanceTransform(binaryImg,distImg,DIST_L1,3);
+    //对输出矩阵distImg中的距离进行归一化处理
     normalize(distImg,distImg,0,1,NORM_MINMAX);
     imshow("distance result",distImg);
 
@@ -66,21 +72,34 @@ int main()
 
     //7.标记,发现轮廓 – findContours
     Mat dist_8u;
-    distImg.convertTo(dist_8u,CV_8U);
+    //(#define CV_8U   0)CV_8U与CV_8UC1的区别：OpenCV中的类型有2个部分，深度(bit)和通道数。该系统足够灵活，可以定义多达512个通道的新类型。
+    //碰巧的是，当您指定1个通道时，类型的通道组件将设置为0，这使得结果等同于简单地使用深度CV_8U。
+    //distImg.convertTo(dist_8u,CV_8U);
+    distImg.convertTo(dist_8u,CV_8UC1);
     vector<vector<Point>> contours;
+    //CV_RETR_EXTERNAL只检测最外围轮廓，包含在外围轮廓内的内围轮廓被忽略
+    //CV_CHAIN_APPROX_SIMPLE 仅保存轮廓的拐点信息，把所有轮廓拐点处的点保存入contours向量内，拐点与拐点之间直线段上的信息点不予保留
     findContours(dist_8u,contours,RETR_EXTERNAL,CHAIN_APPROX_SIMPLE,Point(0,0));
 
-    //8.创建标记,绘制轮廓- drawContours
+    //8.标记,绘制腐蚀的每个Peak轮廓- drawContours
+    //S--代表---signed int---有符号整形;U--代表--unsigned int--无符号整形;F--代表--float---------单精度浮点型
+    //CV_32SC1:32位有符号单通道
     Mat markers = Mat::zeros(src.size(),CV_32SC1);
     for (size_t i = 0;i < contours.size();i++)
     {
+        //thickness = -1代表绘制内部
         drawContours(markers,contours,static_cast<int>(i),
                      Scalar::all(static_cast<int>(i) + 1),-1);
 
     }
     circle(markers,Point(5,5),3,Scalar(255,255,255),-1);
-    imshow("my markers",markers * 1000);
+    imshow(wateshed_win,markers * 1000);
      //9.分水岭变换 watershed
+//watershed( InputArray image, InputOutputArray markers )
+//第一个参数 image，必须是一个8bit 3通道彩色图像矩阵序列
+//第二个参数为输入输出值，必须对第二个参数进行处理，它应该包含不同区域的轮廓，每个轮廓有一个自己唯一的编号，轮廓的定位可以通过Opencv中findContours方法实现，这个是执行分水岭之前的要求。
+//算法会根据markers传入的轮廓作为种子（也就是所谓的注水点），对图像上其他的像素点根据分水岭算法规则进行判断，并对每个像素点的区域归属进行划定，直到处理完图像上所有像素点。
+    //而区域与区域之间的分界处的值被置为“-1”，以做区分。
     watershed(src,markers);
     Mat mark = Mat::zeros(markers.size(),CV_8UC1);
     markers.convertTo(mark,CV_8UC1);
@@ -102,6 +121,7 @@ int main()
     {
         for (int col = 0;col <markers.cols;col++)
         {
+            //通过watershed(src,markers)返回的markers正负值判断测试点在目标内还是目标
             int index = markers.at<int>(row,col);
             if(index > 0 && index <= static_cast<int>(contours.size()))
                 dst.at<Vec3b>(row,col) = colors[index - 1];
