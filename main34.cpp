@@ -106,6 +106,7 @@ int main()
 //当处在不同的汇聚盆地中的水将要聚合在一起时，修建的大坝将阻止聚合。
 //水将达到在水线上只能见到各个水坝的顶部这样一个程度。这些大坝的边界对应于分水岭的分割线。
 //所以，它们是由分水岭算法提取出来的(连续的)边界线。
+    //通过watershed后目标为黑色，背景色为白色
     watershed(src,markers);
     Mat mark = Mat::zeros(markers.size(),CV_8UC1);
     markers.convertTo(mark,CV_8UC1);
