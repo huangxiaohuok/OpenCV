@@ -81,7 +81,7 @@ int main()
     //CV_CHAIN_APPROX_SIMPLE 仅保存轮廓的拐点信息，把所有轮廓拐点处的点保存入contours向量内，拐点与拐点之间直线段上的信息点不予保留
     findContours(dist_8u,contours,RETR_EXTERNAL,CHAIN_APPROX_SIMPLE,Point(0,0));
 
-    //8.标记,绘制腐蚀的每个Peak轮廓- drawContours
+    //8.标记,绘制腐蚀的每个Peak轮廓- drawContours，对marks进行标记，对不同区域的轮廓进行编号，相当于设置注水点，有多少轮廓，就有多少注水点
     //S--代表---signed int---有符号整形;U--代表--unsigned int--无符号整形;F--代表--float---------单精度浮点型
     //CV_32SC1:32位有符号单通道
     Mat markers = Mat::zeros(src.size(),CV_32SC1);
